@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>作品集 - 我的项目展示</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            line-height: 1.6;
+        }
+
+        /* 导航栏 */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #333;
+            z-index: 1000;
+            padding: 1rem 2rem;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #00d4ff;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: #ffffff;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #00d4ff;
+        }
+
+        /* 主要内容 */
+        .main-content {
+            margin-top: 80px;
+            padding: 2rem;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* 页面标题 */
+        .page-header {
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            color: #00d4ff;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-subtitle {
+            color: #cccccc;
+            font-size: 1.1rem;
+        }
+
+        /* 筛选区域 */
+        .filters-section {
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid #333;
+        }
+
+        .filters-row {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .filter-label {
+            font-size: 0.9rem;
+            color: #888;
+        }
+
+        .filter-select {
+            background: #333;
+            color: #ffffff;
+            border: 1px solid #555;
+            border-radius: 6px;
+            padding: 0.5rem;
+            min-width: 150px;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            background: #333;
+            color: #ffffff;
+            border: 1px solid #555;
+            border-radius: 6px;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .filter-btn:hover,
+        .filter-btn.active {
+            background: #00d4ff;
+            color: #000;
+        }
+
+        /* 瀑布流布局 */
+        .portfolio-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .portfolio-card {
+            background: #1a1a1a;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #333;
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+        }
+
+        .portfolio-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 15px 40px rgba(0, 212, 255, 0.3);
+        }
+
+        .portfolio-image {
+            width: 100%;
+            height: 250px;
+            background: linear-gradient(45deg, #00d4ff, #0099cc);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .portfolio-image::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .portfolio-card:hover .portfolio-image::before {
+            opacity: 1;
+        }
+
+        .portfolio-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 212, 255, 0.9);
+            color: #000;
+            padding: 0.8rem 1.5rem;
+            border-radius: 6px;
+            font-weight: bold;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .portfolio-card:hover .portfolio-overlay {
+            opacity: 1;
+        }
+
+        .portfolio-content {
+            padding: 1.5rem;
+        }
+
+        .portfolio-title {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+            color: #ffffff;
+            font-weight: bold;
+        }
+
+        .portfolio-tech {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .tech-tag {
+            background: #333;
+            color: #00d4ff;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+
+        .portfolio-description {
+            color: #cccccc;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+
+        .portfolio-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            font-size: 0.8rem;
+            color: #888;
+        }
+
+        .portfolio-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .like-button {
+            background: none;
+            border: none;
+            color: #ff6b6b;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: transform 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .like-button:hover {
+            transform: scale(1.2);
+        }
+
+        .like-button.liked {
+            color: #ff4757;
+        }
+
+        .view-project {
+            background: #00d4ff;
+            color: white;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: transform 0.2s;
+        }
+
+        .view-project:hover {
+            transform: scale(1.05);
+        }
+
+        /* 项目复杂度标签 */
+        .complexity-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(0, 212, 255, 0.9);
+            color: #000;
+            padding: 0.3rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+
+        .complexity-badge.beginner {
+            background: rgba(76, 175, 80, 0.9);
+        }
+
+        .complexity-badge.intermediate {
+            background: rgba(255, 152, 0, 0.9);
+        }
+
+        .complexity-badge.advanced {
+            background: rgba(244, 67, 54, 0.9);
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .filters-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .portfolio-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .page-title {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">DevPortfolio</div>
+            <ul class="nav-links">
+                <li><a href="index.html">首页</a></li>
+                <li><a href="blog-list.html">我的文章</a></li>
+                <li><a href="portfolio.html">作品集</a></li>
+                <li><a href="admin-login.html">管理入口</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- 主要内容 -->
+    <main class="main-content">
+        <!-- 页面标题 -->
+        <header class="page-header">
+            <h1 class="page-title">作品集</h1>
+            <p class="page-subtitle">展示我的前端项目和技术实践</p>
+        </header>
+
+        <!-- 筛选区域 -->
+        <section class="filters-section">
+            <div class="filters-row">
+                <div class="filter-group">
+                    <label class="filter-label">技术类型</label>
+                    <select class="filter-select">
+                        <option value="">全部技术</option>
+                        <option value="react">React</option>
+                        <option value="vue">Vue.js</option>
+                        <option value="angular">Angular</option>
+                        <option value="threejs">Three.js</option>
+                        <option value="d3">D3.js</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label class="filter-label">项目复杂度</label>
+                    <select class="filter-select">
+                        <option value="">全部级别</option>
+                        <option value="beginner">基础Demo</option>
+                        <option value="intermediate">完整项目</option>
+                        <option value="advanced">高级应用</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label class="filter-label">快速筛选</label>
+                    <div class="filter-buttons">
+                        <button class="filter-btn active" data-filter="all">全部</button>
+                        <button class="filter-btn" data-filter="react">React</button>
+                        <button class="filter-btn" data-filter="vue">Vue</button>
+                        <button class="filter-btn" data-filter="3d">3D</button>
+                        <button class="filter-btn" data-filter="data">数据可视化</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 作品展示 -->
+        <section class="portfolio-grid">
+            <div class="portfolio-card" data-tech="react" data-complexity="intermediate">
+                <div class="complexity-badge intermediate">完整项目</div>
+                <div class="portfolio-image">
+                    🎨
+                    <div class="portfolio-overlay">查看项目</div>
+                </div>
+                <div class="portfolio-content">
+                    <h3 class="portfolio-title">智能任务管理系统</h3>
+                    <div class="portfolio-tech">
+                        <span class="tech-tag">React</span>
+                        <span class="tech-tag">TypeScript</span>
+                        <span class="tech-tag">Node.js</span>
+                        <span class="tech-tag">MongoDB</span>
+                    </div>
+                    <p class="portfolio-description">
+                        基于React和Node.js的智能任务管理平台，支持拖拽排序、实时协作、数据可视化等功能。采用TypeScript确保代码质量，使用WebSocket实现实时通信。
+                    </p>
+                    <div class="portfolio-meta">
+                        <span>开发时间：3个月</span>
+                        <span>代码行数：15,000+</span>
+                    </div>
+                    <div class="portfolio-actions">
+                        <button class="like-button">❤️ 42</button>
+                        <a href="#" class="view-project">查看项目</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="portfolio-card" data-tech="threejs" data-complexity="advanced">
+                <div class="complexity-badge advanced">高级应用</div>
+                <div class="portfolio-image">
+                    🚀
+                    <div class="portfolio-overlay">查看项目</div>
+                </div>
+                <div class="portfolio-content">
+                    <h3 class="portfolio-title">3D产品展示器</h3>
+                    <div class="portfolio-tech">
+                        <span class="tech-tag">Three.js</span>
+                        <span class="tech-tag">Vue.js</span>
+                        <span class="tech-tag">WebGL</span>
+                        <span class="tech-tag">GLTF</span>
+                    </div>
+                    <p class="portfolio-description">
+                        使用Three.js开发的3D产品展示器，支持360度旋转、缩放、材质切换等交互功能。集成物理引擎实现真实的光照和阴影效果。
+                    </p>
+                    <div class="portfolio-meta">
+                        <span>开发时间：2个月</span>
+                        <span>代码行数：8,000+</span>
+                    </div>
+                    <div class="portfolio-actions">
+                        <button class="like-button liked">❤️ 89</button>
+                        <a href="#" class="view-project">查看项目</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="portfolio-card" data-tech="d3" data-complexity="intermediate">
+                <div class="complexity-badge intermediate">完整项目</div>
+                <div class="portfolio-image">
+                    📊
+                    <div class="portfolio-overlay">查看项目</div>
+                </div>
+                <div class="portfolio-content">
+                    <h3 class="portfolio-title">数据可视化仪表板</h3>
+                    <div class="portfolio-tech">
+                        <span class="tech-tag">D3.js</span>
+                        <span class="tech-tag">Angular</span>
+                        <span class="tech-tag">RxJS</span>
+                        <span class="tech-tag">TypeScript</span>
+                    </div>
+                    <p class="portfolio-description">
+                        基于D3.js的数据可视化仪表板，支持多种图表类型、实时数据更新、交互式筛选。使用Angular框架构建，响应式设计适配各种设备。
+                    </p>
+                    <div class="portfolio-meta">
+                        <span>开发时间：2.5个月</span>
+                        <span>代码行数：12,000+</span>
+                    </div>
+                    <div class="portfolio-actions">
+                        <button class="like-button">❤️ 156</button>
+                        <a href="#" class="view-project">查看项目</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="portfolio-card" data-tech="vue" data-complexity="beginner">
+                <div class="complexity-badge beginner">基础Demo</div>
+                <div class="portfolio-image">
+                    🎯
+                    <div class="portfolio-overlay">查看项目</div>
+                </div>
+                <div class="portfolio-content">
+                    <h3 class="portfolio-title">待办事项应用</h3>
+                    <div class="portfolio-tech">
+                        <span class="tech-tag">Vue.js</span>
+                        <span class="tech-tag">Vuex</span>
+                        <span class="tech-tag">CSS3</span>
+                    </div>
+                    <p class="portfolio-description">
+                        使用Vue.js开发的待办事项应用，支持任务的增删改查、分类管理、本地存储等功能。采用Vuex进行状态管理，界面简洁美观。
+                    </p>
+                    <div class="portfolio-meta">
+                        <span>开发时间：1周</span>
+                        <span>代码行数：2,000+</span>
+                    </div>
+                    <div class="portfolio-actions">
+                        <button class="like-button">❤️ 23</button>
+                        <a href="#" class="view-project">查看项目</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="portfolio-card" data-tech="react" data-complexity="intermediate">
+                <div class="complexity-badge intermediate">完整项目</div>
+                <div class="portfolio-image">
+                    🛒
+                    <div class="portfolio-overlay">查看项目</div>
+                </div>
+                <div class="portfolio-content">
+                    <h3 class="portfolio-title">电商购物车</h3>
+                    <div class="portfolio-tech">
+                        <span class="tech-tag">React</span>
+                        <span class="tech-tag">Redux</span>
+                        <span class="tech-tag">Styled-components</span>
+                        <span class="tech-tag">Jest</span>
+                    </div>
+                    <p class="portfolio-description">
+                        基于React的电商购物车应用，包含商品展示、购物车管理、订单处理等功能。使用Redux进行状态管理，集成单元测试确保代码质量。
+                    </p>
+                    <div class="portfolio-meta">
+                        <span>开发时间：1.5个月</span>
+                        <span>代码行数：6,000+</span>
+                    </div>
+                    <div class="portfolio-actions">
+                        <button class="like-button">❤️ 67</button>
+                        <a href="#" class="view-project">查看项目</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="portfolio-card" data-tech="threejs" data-complexity="beginner">
+                <div class="complexity-badge beginner">基础Demo</div>
+                <div class="portfolio-image">
+                    🌟
+                    <div class="portfolio-overlay">查看项目</div>
+                </div>
+                <div class="portfolio-content">
+                    <h3 class="portfolio-title">粒子动画效果</h3>
+                    <div class="portfolio-tech">
+                        <span class="tech-tag">Three.js</span>
+                        <span class="tech-tag">JavaScript</span>
+                        <span class="tech-tag">WebGL</span>
+                    </div>
+                    <p class="portfolio-description">
+                        使用Three.js创建的粒子动画效果，支持鼠标交互、颜色变化、运动轨迹等效果。展示了WebGL在网页中的强大图形处理能力。
+                    </p>
+                    <div class="portfolio-meta">
+                        <span>开发时间：3天</span>
+                        <span>代码行数：800+</span>
+                    </div>
+                    <div class="portfolio-actions">
+                        <button class="like-button">❤️ 34</button>
+                        <a href="#" class="view-project">查看项目</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // 筛选功能
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                // 更新按钮状态
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                
+                const filter = this.dataset.filter;
+                const cards = document.querySelectorAll('.portfolio-card');
+                
+                cards.forEach(card => {
+                    if (filter === 'all' || card.dataset.tech === filter) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+        });
+
+        // 下拉筛选
+        document.querySelectorAll('.filter-select').forEach(select => {
+            select.addEventListener('change', function() {
+                console.log('筛选条件改变:', this.value);
+                // 这里可以添加实际的筛选逻辑
+            });
+        });
+
+        // 点赞功能
+        document.querySelectorAll('.like-button').forEach(button => {
+            button.addEventListener('click', function() {
+                this.classList.toggle('liked');
+                const currentText = this.textContent;
+                const currentLikes = parseInt(currentText.match(/\d+/)[0]);
+                
+                if (this.classList.contains('liked')) {
+                    this.textContent = `❤️ ${currentLikes + 1}`;
+                } else {
+                    this.textContent = `❤️ ${currentLikes - 1}`;
+                }
+            });
+        });
+
+        // 卡片点击效果
+        document.querySelectorAll('.portfolio-card').forEach(card => {
+            card.addEventListener('click', function(e) {
+                // 如果点击的不是按钮，则打开项目链接
+                if (!e.target.closest('.like-button') && !e.target.closest('.view-project')) {
+                    console.log('打开项目:', this.querySelector('.portfolio-title').textContent);
+                }
+            });
+        });
+    </script>
+</body>
+</html> 

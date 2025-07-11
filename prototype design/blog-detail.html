@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>React 18 新特性深度解析 - 文章详情</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            line-height: 1.6;
+        }
+
+        /* 阅读进度条 */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 0%;
+            height: 3px;
+            background: linear-gradient(90deg, #00d4ff, #0099cc);
+            z-index: 1001;
+            transition: width 0.3s ease;
+        }
+
+        /* 导航栏 */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #333;
+            z-index: 1000;
+            padding: 1rem 2rem;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #00d4ff;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: #ffffff;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #00d4ff;
+        }
+
+        /* 主要内容 */
+        .main-content {
+            margin-top: 80px;
+            padding: 2rem;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* 面包屑导航 */
+        .breadcrumb {
+            margin-bottom: 2rem;
+            font-size: 0.9rem;
+            color: #888;
+        }
+
+        .breadcrumb a {
+            color: #00d4ff;
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        /* 文章头部 */
+        .article-header {
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid #333;
+        }
+
+        .article-title {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: #ffffff;
+            line-height: 1.3;
+        }
+
+        .article-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            color: #888;
+        }
+
+        .article-tags {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            background: #333;
+            color: #00d4ff;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+
+        .article-stats {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .stats-item {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        /* 阅读控制 */
+        .reading-controls {
+            position: fixed;
+            top: 100px;
+            right: 2rem;
+            background: rgba(26, 26, 26, 0.9);
+            border-radius: 12px;
+            padding: 1rem;
+            border: 1px solid #333;
+            z-index: 999;
+        }
+
+        .control-group {
+            margin-bottom: 1rem;
+        }
+
+        .control-label {
+            font-size: 0.8rem;
+            color: #888;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .font-size-controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .font-btn {
+            background: #333;
+            color: #ffffff;
+            border: 1px solid #555;
+            border-radius: 4px;
+            padding: 0.3rem 0.6rem;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s;
+        }
+
+        .font-btn:hover,
+        .font-btn.active {
+            background: #00d4ff;
+            color: #000;
+        }
+
+        .theme-toggle {
+            background: #333;
+            color: #ffffff;
+            border: 1px solid #555;
+            border-radius: 6px;
+            padding: 0.5rem;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s;
+        }
+
+        .theme-toggle:hover {
+            background: #00d4ff;
+            color: #000;
+        }
+
+        /* 文章内容 */
+        .article-content {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #e0e0e0;
+        }
+
+        .article-content h2 {
+            font-size: 1.8rem;
+            margin: 2rem 0 1rem 0;
+            color: #00d4ff;
+        }
+
+        .article-content h3 {
+            font-size: 1.4rem;
+            margin: 1.5rem 0 1rem 0;
+            color: #ffffff;
+        }
+
+        .article-content p {
+            margin-bottom: 1.5rem;
+        }
+
+        .article-content code {
+            background: #1a1a1a;
+            color: #00d4ff;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .article-content pre {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1.5rem 0;
+            overflow-x: auto;
+        }
+
+        .article-content pre code {
+            background: none;
+            padding: 0;
+            color: #e0e0e0;
+        }
+
+        .article-content blockquote {
+            border-left: 4px solid #00d4ff;
+            padding-left: 1rem;
+            margin: 1.5rem 0;
+            color: #cccccc;
+            font-style: italic;
+        }
+
+        .article-content ul,
+        .article-content ol {
+            margin: 1.5rem 0;
+            padding-left: 2rem;
+        }
+
+        .article-content li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* 互动区域 */
+        .article-actions {
+            margin: 3rem 0;
+            padding: 2rem;
+            background: #1a1a1a;
+            border-radius: 12px;
+            border: 1px solid #333;
+            text-align: center;
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .action-btn {
+            background: #333;
+            color: #ffffff;
+            border: 1px solid #555;
+            border-radius: 6px;
+            padding: 0.8rem 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .action-btn:hover {
+            background: #00d4ff;
+            color: #000;
+        }
+
+        .action-btn.liked {
+            background: #ff4757;
+            color: #ffffff;
+        }
+
+        /* 相关推荐 */
+        .related-articles {
+            margin-top: 4rem;
+            padding-top: 2rem;
+            border-top: 1px solid #333;
+        }
+
+        .related-title {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: #00d4ff;
+        }
+
+        .related-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .related-card {
+            background: #1a1a1a;
+            border-radius: 8px;
+            padding: 1rem;
+            border: 1px solid #333;
+            transition: transform 0.3s;
+        }
+
+        .related-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .related-card h4 {
+            color: #ffffff;
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .related-card p {
+            color: #cccccc;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .related-card .date {
+            color: #888;
+            font-size: 0.8rem;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .reading-controls {
+                position: static;
+                margin-bottom: 2rem;
+            }
+            
+            .article-title {
+                font-size: 2rem;
+            }
+            
+            .article-meta {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 阅读进度条 -->
+    <div class="progress-bar" id="progressBar"></div>
+
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">DevPortfolio</div>
+            <ul class="nav-links">
+                <li><a href="index.html">首页</a></li>
+                <li><a href="blog-list.html">我的文章</a></li>
+                <li><a href="portfolio.html">作品集</a></li>
+                <li><a href="admin-login.html">管理入口</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- 阅读控制 -->
+    <div class="reading-controls">
+        <div class="control-group">
+            <label class="control-label">字体大小</label>
+            <div class="font-size-controls">
+                <button class="font-btn" data-size="small">小</button>
+                <button class="font-btn active" data-size="medium">中</button>
+                <button class="font-btn" data-size="large">大</button>
+            </div>
+        </div>
+        <div class="control-group">
+            <button class="theme-toggle" id="themeToggle">🌙 暗色模式</button>
+        </div>
+    </div>
+
+    <!-- 主要内容 -->
+    <main class="main-content">
+        <!-- 面包屑导航 -->
+        <nav class="breadcrumb">
+            <a href="index.html">首页</a> > 
+            <a href="blog-list.html">我的文章</a> > 
+            React 18 新特性深度解析
+        </nav>
+
+        <!-- 文章头部 -->
+        <header class="article-header">
+            <h1 class="article-title">React 18 新特性深度解析</h1>
+            <div class="article-meta">
+                <div class="article-tags">
+                    <span class="tag">React</span>
+                    <span class="tag">JavaScript</span>
+                    <span class="tag">前端</span>
+                </div>
+                <div class="article-stats">
+                    <div class="stats-item">
+                        <span>👁️</span>
+                        <span>1,234</span>
+                    </div>
+                    <div class="stats-item">
+                        <span>💬</span>
+                        <span>23</span>
+                    </div>
+                    <div class="stats-item">
+                        <span>❤️</span>
+                        <span>156</span>
+                    </div>
+                </div>
+            </div>
+            <div class="article-meta">
+                <span>发布时间：2024-01-15</span>
+                <span>阅读时间：约 8 分钟</span>
+            </div>
+        </header>
+
+        <!-- 文章内容 -->
+        <article class="article-content">
+            <p>
+                React 18 的发布带来了许多激动人心的新特性，这些特性不仅提升了应用的性能，还为开发者提供了更强大的工具来构建更好的用户体验。本文将深入探讨这些新特性的核心概念和实际应用。
+            </p>
+
+            <h2>1. 并发特性 (Concurrent Features)</h2>
+            <p>
+                并发是 React 18 最重要的新特性之一。它允许 React 中断和恢复渲染工作，从而提供更好的用户体验。当用户与界面交互时，React 可以暂停正在进行的渲染工作，优先处理用户输入。
+            </p>
+
+            <h3>1.1 自动批处理 (Automatic Batching)</h3>
+            <p>
+                在 React 18 之前，批处理只在事件处理函数中自动发生。现在，批处理在所有地方都会自动发生，包括 Promise、setTimeout、原生事件处理函数等。
+            </p>
+
+            <pre><code>// React 18 之前的代码
+function handleClick() {
+  setCount(c => c + 1); // 不会批处理
+  setFlag(f => !f);     // 不会批处理
+  // 导致两次重新渲染
+}
+
+// React 18 中的代码
+function handleClick() {
+  setCount(c => c + 1); // 会批处理
+  setFlag(f => !f);     // 会批处理
+  // 只导致一次重新渲染
+}</code></pre>
+
+            <h3>1.2 Suspense 改进</h3>
+            <p>
+                Suspense 现在支持服务端渲染，并且可以更好地处理数据获取。这使得我们可以构建更流畅的加载体验。
+            </p>
+
+            <blockquote>
+                注意：并发特性是可选的，现有的 React 应用可以逐步采用这些新特性，而不会破坏现有功能。
+            </blockquote>
+
+            <h2>2. 新的 Hooks</h2>
+            <p>
+                React 18 引入了几个新的 Hooks，它们为并发特性提供了更好的支持。
+            </p>
+
+            <h3>2.1 useTransition</h3>
+            <p>
+                useTransition 允许我们标记某些状态更新为非紧急的，这样 React 就可以在后台处理这些更新，而不会阻塞用户界面。
+            </p>
+
+            <pre><code>import { useTransition } from 'react';
+
+function SearchResults() {
+  const [query, setQuery] = useState('');
+  const [results, setResults] = useState([]);
+  const [isPending, startTransition] = useTransition();
+
+  const handleSearch = (newQuery) => {
+    setQuery(newQuery); // 立即更新输入框
+    
+    startTransition(() => {
+      setResults(searchAPI(newQuery)); // 在后台更新结果
+    });
+  };
+
+  return (
+    &lt;div&gt;
+      &lt;input value={query} onChange={e => handleSearch(e.target.value)} /&gt;
+      {isPending && &lt;div&gt;搜索中...&lt;/div&gt;}
+      &lt;ResultsList results={results} /&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+
+            <h3>2.2 useDeferredValue</h3>
+            <p>
+                useDeferredValue 类似于 useTransition，但它用于延迟更新某个值，直到紧急更新完成。
+            </p>
+
+            <h2>3. 服务端渲染改进</h2>
+            <p>
+                React 18 对服务端渲染进行了重大改进，包括：
+            </p>
+
+            <ul>
+                <li>支持 Suspense 在服务端</li>
+                <li>选择性注水 (Selective Hydration)</li>
+                <li>更好的错误边界支持</li>
+            </ul>
+
+            <h2>4. 实际应用建议</h2>
+            <p>
+                在将应用升级到 React 18 时，建议采用渐进式的方法：
+            </p>
+
+            <ol>
+                <li>首先升级 React 版本并测试现有功能</li>
+                <li>逐步引入并发特性，从 useTransition 开始</li>
+                <li>优化数据获取逻辑，利用 Suspense</li>
+                <li>测试性能改进和用户体验提升</li>
+            </ol>
+
+            <p>
+                通过这些新特性，我们可以构建更快速、更流畅的 React 应用，为用户提供更好的交互体验。
+            </p>
+        </article>
+
+        <!-- 互动区域 -->
+        <div class="article-actions">
+            <div class="action-buttons">
+                <button class="action-btn" id="likeBtn">
+                    <span>❤️</span>
+                    <span>点赞 (156)</span>
+                </button>
+                <button class="action-btn">
+                    <span>📤</span>
+                    <span>分享</span>
+                </button>
+                <button class="action-btn">
+                    <span>💬</span>
+                    <span>评论</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- 相关推荐 -->
+        <section class="related-articles">
+            <h3 class="related-title">相关文章</h3>
+            <div class="related-grid">
+                <div class="related-card">
+                    <h4>TypeScript 高级类型技巧</h4>
+                    <p>分享一些TypeScript高级类型的使用技巧...</p>
+                    <div class="date">2024-01-10</div>
+                </div>
+                <div class="related-card">
+                    <h4>现代CSS布局技术对比</h4>
+                    <p>对比Flexbox、Grid、Container Queries等...</p>
+                    <div class="date">2024-01-05</div>
+                </div>
+                <div class="related-card">
+                    <h4>Vue 3 Composition API 实战指南</h4>
+                    <p>详细介绍Vue 3 Composition API的使用方法...</p>
+                    <div class="date">2023-12-28</div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // 阅读进度条
+        function updateProgressBar() {
+            const scrollTop = window.pageYOffset;
+            const docHeight = document.body.offsetHeight - window.innerHeight;
+            const scrollPercent = (scrollTop / docHeight) * 100;
+            document.getElementById('progressBar').style.width = scrollPercent + '%';
+        }
+
+        window.addEventListener('scroll', updateProgressBar);
+
+        // 字体大小控制
+        document.querySelectorAll('.font-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.font-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                
+                const size = this.dataset.size;
+                const content = document.querySelector('.article-content');
+                
+                switch(size) {
+                    case 'small':
+                        content.style.fontSize = '1rem';
+                        break;
+                    case 'medium':
+                        content.style.fontSize = '1.1rem';
+                        break;
+                    case 'large':
+                        content.style.fontSize = '1.3rem';
+                        break;
+                }
+            });
+        });
+
+        // 主题切换
+        const themeToggle = document.getElementById('themeToggle');
+        let isDark = true;
+        
+        themeToggle.addEventListener('click', function() {
+            isDark = !isDark;
+            if (isDark) {
+                document.body.style.background = '#0a0a0a';
+                document.body.style.color = '#ffffff';
+                this.textContent = '🌙 暗色模式';
+            } else {
+                document.body.style.background = '#ffffff';
+                document.body.style.color = '#000000';
+                this.textContent = '☀️ 亮色模式';
+            }
+        });
+
+        // 点赞功能
+        const likeBtn = document.getElementById('likeBtn');
+        likeBtn.addEventListener('click', function() {
+            this.classList.toggle('liked');
+            const text = this.querySelector('span:last-child');
+            const currentLikes = parseInt(text.textContent.match(/\d+/)[0]);
+            
+            if (this.classList.contains('liked')) {
+                text.textContent = `点赞 (${currentLikes + 1})`;
+            } else {
+                text.textContent = `点赞 (${currentLikes - 1})`;
+            }
+        });
+    </script>
+</body>
+</html> 

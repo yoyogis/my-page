@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的个人网站 - 首页</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            line-height: 1.6;
+        }
+
+        /* 导航栏 */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #333;
+            z-index: 1000;
+            padding: 1rem 2rem;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .nav-search {
+            position: relative;
+            min-width: 300px;
+        }
+
+        .nav-search-input {
+            background: #333;
+            color: #ffffff;
+            border: 1px solid #555;
+            border-radius: 6px;
+            padding: 0.5rem 1rem 0.5rem 2.5rem;
+            font-size: 0.9rem;
+            width: 100%;
+        }
+
+        .nav-search-input:focus {
+            outline: none;
+            border-color: #00d4ff;
+        }
+
+        .nav-search-icon {
+            position: absolute;
+            left: 0.8rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #888;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #00d4ff;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: #ffffff;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #00d4ff;
+        }
+
+        /* 主要内容 */
+        .main-content {
+            margin-top: 80px;
+            padding: 2rem;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* 英雄区域 */
+        .hero {
+            text-align: center;
+            padding: 4rem 0;
+            background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
+            border-radius: 15px;
+            margin-bottom: 3rem;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #00d4ff, #0099cc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: #cccccc;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* 博客预览区 */
+        .section {
+            margin-bottom: 4rem;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            color: #00d4ff;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .section-title::before {
+            content: '';
+            width: 4px;
+            height: 2rem;
+            background: #00d4ff;
+            border-radius: 2px;
+        }
+
+        .blog-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .blog-card {
+            background: transparent;
+            padding: 2rem 0;
+            border-bottom: 1px solid #333;
+            width: 100%;
+        }
+
+        .blog-card:last-child {
+            border-bottom: none;
+        }
+
+        .blog-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            color: #888;
+        }
+
+        .blog-title {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            color: #ffffff;
+        }
+
+        .blog-excerpt {
+            color: #cccccc;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .read-more {
+            background: linear-gradient(45deg, #00d4ff, #0099cc);
+            color: white;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .read-more:hover {
+            transform: scale(1.05);
+        }
+
+        /* 作品展示区 */
+        .portfolio-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .portfolio-card {
+            background: #1a1a1a;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #333;
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+        }
+
+        .portfolio-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 15px 40px rgba(0, 212, 255, 0.3);
+        }
+
+        .portfolio-image {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(45deg, #00d4ff, #0099cc);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: white;
+        }
+
+        .portfolio-content {
+            padding: 1.5rem;
+        }
+
+        .portfolio-title {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            color: #ffffff;
+        }
+
+        .portfolio-tech {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .tech-tag {
+            background: #333;
+            color: #00d4ff;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+
+        .portfolio-description {
+            color: #cccccc;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .portfolio-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .like-button {
+            background: none;
+            border: none;
+            color: #ff6b6b;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: transform 0.2s;
+        }
+
+        .like-button:hover {
+            transform: scale(1.2);
+        }
+
+        .like-button.liked {
+            color: #ff4757;
+        }
+
+        .view-project {
+            background: #00d4ff;
+            color: white;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .nav-search {
+                min-width: 200px;
+            }
+            
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .blog-card {
+                padding: 1.5rem 0;
+            }
+            
+            .portfolio-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-left">
+                <div class="logo">DevPortfolio</div>
+                <div class="nav-search">
+                    <span class="nav-search-icon">🔍</span>
+                    <input type="text" class="nav-search-input" placeholder="搜索文章和作品..." id="navSearch">
+                </div>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html">首页</a></li>
+                <li><a href="blog-list.html">我的文章</a></li>
+                <li><a href="portfolio.html">作品集</a></li>
+                <li><a href="admin-login.html">管理入口</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- 主要内容 -->
+    <main class="main-content">
+        <!-- 英雄区域 -->
+        <section class="hero">
+            <h1>欢迎来到我的技术世界</h1>
+            <p>前端开发者 | 技术博主 | 开源贡献者</p>
+        </section>
+
+        <!-- 博客预览区 -->
+        <section class="section">
+            <h2 class="section-title">最新博文</h2>
+            <div class="blog-grid">
+                <article class="blog-card">
+                    <div class="blog-meta">
+                        <span>2024-01-15</span>
+                        <span>👁️ 1,234</span>
+                    </div>
+                    <h3 class="blog-title">React 18 新特性深度解析</h3>
+                    <p class="blog-excerpt">
+                        深入探讨React 18带来的并发特性、自动批处理、Suspense改进等核心功能，以及如何在实际项目中应用这些新特性来提升用户体验...
+                    </p>
+                    <button class="read-more">继续阅读</button>
+                </article>
+
+                <article class="blog-card">
+                    <div class="blog-meta">
+                        <span>2024-01-10</span>
+                        <span>👁️ 856</span>
+                    </div>
+                    <h3 class="blog-title">TypeScript 高级类型技巧</h3>
+                    <p class="blog-excerpt">
+                        分享一些TypeScript高级类型的使用技巧，包括条件类型、映射类型、模板字面量类型等，帮助你写出更优雅的类型定义...
+                    </p>
+                    <button class="read-more">继续阅读</button>
+                </article>
+
+                <article class="blog-card">
+                    <div class="blog-meta">
+                        <span>2024-01-05</span>
+                        <span>👁️ 1,567</span>
+                    </div>
+                    <h3 class="blog-title">现代CSS布局技术对比</h3>
+                    <p class="blog-excerpt">
+                        对比Flexbox、Grid、Container Queries等现代CSS布局技术，分析它们的适用场景和最佳实践，帮助你选择最合适的布局方案...
+                    </p>
+                    <button class="read-more">继续阅读</button>
+                </article>
+            </div>
+        </section>
+
+        <!-- 作品展示区 -->
+        <section class="section">
+            <h2 class="section-title">精选作品</h2>
+            <div class="portfolio-grid">
+                <div class="portfolio-card">
+                    <div class="portfolio-image">🎨</div>
+                    <div class="portfolio-content">
+                        <h3 class="portfolio-title">智能任务管理系统</h3>
+                        <div class="portfolio-tech">
+                            <span class="tech-tag">React</span>
+                            <span class="tech-tag">TypeScript</span>
+                            <span class="tech-tag">Node.js</span>
+                        </div>
+                        <p class="portfolio-description">
+                            基于React和Node.js的智能任务管理平台，支持拖拽排序、实时协作、数据可视化等功能
+                        </p>
+                        <div class="portfolio-actions">
+                            <button class="like-button">❤️ 42</button>
+                            <a href="#" class="view-project">查看项目</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="portfolio-card">
+                    <div class="portfolio-image">🚀</div>
+                    <div class="portfolio-content">
+                        <h3 class="portfolio-title">3D产品展示器</h3>
+                        <div class="portfolio-tech">
+                            <span class="tech-tag">Three.js</span>
+                            <span class="tech-tag">Vue.js</span>
+                            <span class="tech-tag">WebGL</span>
+                        </div>
+                        <p class="portfolio-description">
+                            使用Three.js开发的3D产品展示器，支持360度旋转、缩放、材质切换等交互功能
+                        </p>
+                        <div class="portfolio-actions">
+                            <button class="like-button liked">❤️ 89</button>
+                            <a href="#" class="view-project">查看项目</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="portfolio-card">
+                    <div class="portfolio-image">📊</div>
+                    <div class="portfolio-content">
+                        <h3 class="portfolio-title">数据可视化仪表板</h3>
+                        <div class="portfolio-tech">
+                            <span class="tech-tag">D3.js</span>
+                            <span class="tech-tag">Angular</span>
+                            <span class="tech-tag">RxJS</span>
+                        </div>
+                        <p class="portfolio-description">
+                            基于D3.js的数据可视化仪表板，支持多种图表类型、实时数据更新、交互式筛选
+                        </p>
+                        <div class="portfolio-actions">
+                            <button class="like-button">❤️ 156</button>
+                            <a href="#" class="view-project">查看项目</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // 导航栏搜索功能
+        const navSearch = document.getElementById('navSearch');
+        
+        navSearch.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                const keyword = this.value.trim();
+                if (keyword) {
+                    // 跳转到搜索结果页
+                    window.location.href = `search-results.html?q=${encodeURIComponent(keyword)}`;
+                }
+            }
+        });
+
+        // 点赞功能
+        document.querySelectorAll('.like-button').forEach(button => {
+            button.addEventListener('click', function() {
+                this.classList.toggle('liked');
+                const currentText = this.textContent;
+                const currentLikes = parseInt(currentText.match(/\d+/)[0]);
+                
+                if (this.classList.contains('liked')) {
+                    this.textContent = `❤️ ${currentLikes + 1}`;
+                } else {
+                    this.textContent = `❤️ ${currentLikes - 1}`;
+                }
+            });
+        });
+
+        // 继续阅读按钮
+        document.querySelectorAll('.read-more').forEach(button => {
+            button.addEventListener('click', function() {
+                // 这里可以跳转到文章详情页
+                console.log('跳转到文章详情页');
+            });
+        });
+    </script>
+</body>
+</html> 

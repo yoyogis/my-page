@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理员登录 - 后台管理</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            color: #ffffff;
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* 登录容器 */
+        .login-container {
+            background: rgba(26, 26, 26, 0.95);
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            border: 1px solid #333;
+            width: 100%;
+            max-width: 400px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #00d4ff, #0099cc);
+        }
+
+        /* 登录头部 */
+        .login-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .login-logo {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #00d4ff;
+            margin-bottom: 0.5rem;
+        }
+
+        .login-subtitle {
+            color: #cccccc;
+            font-size: 0.9rem;
+        }
+
+        /* 表单样式 */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #cccccc;
+            font-size: 0.9rem;
+        }
+
+        .form-input {
+            width: 100%;
+            background: #333;
+            color: #ffffff;
+            border: 1px solid #555;
+            border-radius: 8px;
+            padding: 0.8rem 1rem;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #00d4ff;
+            box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.1);
+        }
+
+        .form-input.error {
+            border-color: #ff4757;
+        }
+
+        .error-message {
+            color: #ff4757;
+            font-size: 0.8rem;
+            margin-top: 0.3rem;
+            display: none;
+        }
+
+        /* 验证码区域 */
+        .otp-section {
+            display: none;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #333;
+        }
+
+        .otp-section.active {
+            display: block;
+        }
+
+        .otp-inputs {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+
+        .otp-input {
+            width: 50px;
+            height: 50px;
+            background: #333;
+            color: #ffffff;
+            border: 1px solid #555;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .otp-input:focus {
+            outline: none;
+            border-color: #00d4ff;
+            box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.1);
+        }
+
+        .otp-timer {
+            text-align: center;
+            color: #888;
+            font-size: 0.8rem;
+            margin-bottom: 1rem;
+        }
+
+        .resend-btn {
+            background: none;
+            border: none;
+            color: #00d4ff;
+            cursor: pointer;
+            font-size: 0.8rem;
+            text-decoration: underline;
+        }
+
+        .resend-btn:disabled {
+            color: #555;
+            cursor: not-allowed;
+            text-decoration: none;
+        }
+
+        /* 按钮样式 */
+        .login-btn {
+            width: 100%;
+            background: linear-gradient(45deg, #00d4ff, #0099cc);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 1rem;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 1rem;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 212, 255, 0.3);
+        }
+
+        .login-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .back-btn {
+            width: 100%;
+            background: #333;
+            color: #ffffff;
+            border: 1px solid #555;
+            border-radius: 8px;
+            padding: 0.8rem;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: #444;
+        }
+
+        /* 加载动画 */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #ffffff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* 安全提示 */
+        .security-tips {
+            margin-top: 2rem;
+            padding: 1rem;
+            background: rgba(0, 212, 255, 0.1);
+            border-radius: 8px;
+            border: 1px solid rgba(0, 212, 255, 0.2);
+        }
+
+        .security-tips h4 {
+            color: #00d4ff;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .security-tips ul {
+            list-style: none;
+            font-size: 0.8rem;
+            color: #cccccc;
+        }
+
+        .security-tips li {
+            margin-bottom: 0.3rem;
+            padding-left: 1rem;
+            position: relative;
+        }
+
+        .security-tips li::before {
+            content: '🔒';
+            position: absolute;
+            left: 0;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 480px) {
+            .login-container {
+                margin: 1rem;
+                padding: 2rem;
+            }
+            
+            .otp-inputs {
+                gap: 0.3rem;
+            }
+            
+            .otp-input {
+                width: 40px;
+                height: 40px;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <!-- 登录头部 -->
+        <div class="login-header">
+            <div class="login-logo">DevPortfolio</div>
+            <div class="login-subtitle">管理员登录</div>
+        </div>
+
+        <!-- 登录表单 -->
+        <form id="loginForm">
+            <!-- 第一步：用户名密码 -->
+            <div id="step1">
+                <div class="form-group">
+                    <label class="form-label" for="username">用户名</label>
+                    <input type="text" id="username" class="form-input" placeholder="请输入用户名" required>
+                    <div class="error-message" id="usernameError">请输入有效的用户名</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="password">密码</label>
+                    <input type="password" id="password" class="form-input" placeholder="请输入密码" required>
+                    <div class="error-message" id="passwordError">密码不能为空</div>
+                </div>
+
+                <button type="submit" class="login-btn" id="loginBtn">
+                    <span id="loginBtnText">登录</span>
+                    <span class="loading" id="loginLoading" style="display: none;"></span>
+                </button>
+            </div>
+
+            <!-- 第二步：验证码 -->
+            <div class="otp-section" id="step2">
+                <div class="form-group">
+                    <label class="form-label">验证码</label>
+                    <div class="otp-inputs">
+                        <input type="text" class="otp-input" maxlength="1" data-index="0">
+                        <input type="text" class="otp-input" maxlength="1" data-index="1">
+                        <input type="text" class="otp-input" maxlength="1" data-index="2">
+                        <input type="text" class="otp-input" maxlength="1" data-index="3">
+                        <input type="text" class="otp-input" maxlength="1" data-index="4">
+                        <input type="text" class="otp-input" maxlength="1" data-index="5">
+                    </div>
+                    <div class="otp-timer" id="otpTimer">
+                        验证码已发送到您的邮箱，<span id="timer">60</span>秒后可重新发送
+                    </div>
+                    <button type="button" class="resend-btn" id="resendBtn" disabled>重新发送验证码</button>
+                </div>
+
+                <button type="button" class="login-btn" id="verifyBtn">
+                    <span id="verifyBtnText">验证</span>
+                    <span class="loading" id="verifyLoading" style="display: none;"></span>
+                </button>
+                <button type="button" class="back-btn" id="backBtn">返回上一步</button>
+            </div>
+        </form>
+
+        <!-- 安全提示 -->
+        <div class="security-tips">
+            <h4>安全提示</h4>
+            <ul>
+                <li>请确保在安全的网络环境下登录</li>
+                <li>不要与他人分享您的登录凭据</li>
+                <li>定期更换密码以确保账户安全</li>
+                <li>如遇异常登录，请及时联系管理员</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        let timer = null;
+        let countdown = 60;
+
+        // 表单验证
+        function validateForm() {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+            let isValid = true;
+
+            // 验证用户名
+            if (!username) {
+                showError('usernameError', '请输入用户名');
+                document.getElementById('username').classList.add('error');
+                isValid = false;
+            } else {
+                hideError('usernameError');
+                document.getElementById('username').classList.remove('error');
+            }
+
+            // 验证密码
+            if (!password) {
+                showError('passwordError', '请输入密码');
+                document.getElementById('password').classList.add('error');
+                isValid = false;
+            } else {
+                hideError('passwordError');
+                document.getElementById('password').classList.remove('error');
+            }
+
+            return isValid;
+        }
+
+        function showError(elementId, message) {
+            const errorElement = document.getElementById(elementId);
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+        }
+
+        function hideError(elementId) {
+            document.getElementById(elementId).style.display = 'none';
+        }
+
+        // 登录表单提交
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            if (!validateForm()) return;
+
+            // 显示加载状态
+            const loginBtn = document.getElementById('loginBtn');
+            const loginBtnText = document.getElementById('loginBtnText');
+            const loginLoading = document.getElementById('loginLoading');
+            
+            loginBtn.disabled = true;
+            loginBtnText.style.display = 'none';
+            loginLoading.style.display = 'inline-block';
+
+            // 模拟登录请求
+            setTimeout(() => {
+                // 隐藏加载状态
+                loginBtn.disabled = false;
+                loginBtnText.style.display = 'inline';
+                loginLoading.style.display = 'none';
+
+                // 进入第二步
+                showStep2();
+            }, 2000);
+        });
+
+        // 显示第二步
+        function showStep2() {
+            document.getElementById('step1').style.display = 'none';
+            document.getElementById('step2').classList.add('active');
+            currentStep = 2;
+            
+            // 开始倒计时
+            startCountdown();
+            
+            // 聚焦第一个验证码输入框
+            document.querySelector('.otp-input').focus();
+        }
+
+        // 返回第一步
+        document.getElementById('backBtn').addEventListener('click', function() {
+            document.getElementById('step2').classList.remove('active');
+            document.getElementById('step1').style.display = 'block';
+            currentStep = 1;
+            
+            // 停止倒计时
+            if (timer) {
+                clearInterval(timer);
+                timer = null;
+            }
+        });
+
+        // 验证码输入处理
+        document.querySelectorAll('.otp-input').forEach((input, index) => {
+            input.addEventListener('input', function(e) {
+                const value = e.target.value;
+                
+                if (value.length === 1) {
+                    // 自动跳转到下一个输入框
+                    if (index < 5) {
+                        document.querySelector(`[data-index="${index + 1}"]`).focus();
+                    }
+                }
+            });
+
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Backspace' && e.target.value === '') {
+                    // 退格时跳转到上一个输入框
+                    if (index > 0) {
+                        document.querySelector(`[data-index="${index - 1}"]`).focus();
+                    }
+                }
+            });
+        });
+
+        // 验证按钮
+        document.getElementById('verifyBtn').addEventListener('click', function() {
+            const otpInputs = document.querySelectorAll('.otp-input');
+            const otp = Array.from(otpInputs).map(input => input.value).join('');
+            
+            if (otp.length !== 6) {
+                alert('请输入完整的6位验证码');
+                return;
+            }
+
+            // 显示加载状态
+            const verifyBtn = document.getElementById('verifyBtn');
+            const verifyBtnText = document.getElementById('verifyBtnText');
+            const verifyLoading = document.getElementById('verifyLoading');
+            
+            verifyBtn.disabled = true;
+            verifyBtnText.style.display = 'none';
+            verifyLoading.style.display = 'inline-block';
+
+            // 模拟验证请求
+            setTimeout(() => {
+                // 验证成功，跳转到管理后台
+                window.location.href = 'admin-dashboard.html';
+            }, 1500);
+        });
+
+        // 重新发送验证码
+        document.getElementById('resendBtn').addEventListener('click', function() {
+            this.disabled = true;
+            countdown = 60;
+            startCountdown();
+            
+            // 清空验证码输入框
+            document.querySelectorAll('.otp-input').forEach(input => {
+                input.value = '';
+            });
+            
+            // 聚焦第一个输入框
+            document.querySelector('.otp-input').focus();
+        });
+
+        // 倒计时功能
+        function startCountdown() {
+            const timerElement = document.getElementById('timer');
+            const resendBtn = document.getElementById('resendBtn');
+            
+            timer = setInterval(() => {
+                countdown--;
+                timerElement.textContent = countdown;
+                
+                if (countdown <= 0) {
+                    clearInterval(timer);
+                    timer = null;
+                    resendBtn.disabled = false;
+                    document.getElementById('otpTimer').textContent = '验证码已过期，请重新发送';
+                }
+            }, 1000);
+        }
+
+        // 回车键提交
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                if (currentStep === 1) {
+                    document.getElementById('loginForm').dispatchEvent(new Event('submit'));
+                } else if (currentStep === 2) {
+                    document.getElementById('verifyBtn').click();
+                }
+            }
+        });
+    </script>
+</body>
+</html> 

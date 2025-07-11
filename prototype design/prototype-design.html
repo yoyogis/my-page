@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人网站原型设计稿 - DevPortfolio</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            color: #ffffff;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* 页面标题 */
+        .page-header {
+            text-align: center;
+            padding: 3rem 2rem;
+            background: rgba(26, 26, 26, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #333;
+        }
+
+        .main-title {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #00d4ff, #0099cc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: #cccccc;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* 页面导航 */
+        .page-nav {
+            position: sticky;
+            top: 0;
+            background: rgba(26, 26, 26, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #333;
+            z-index: 1000;
+            padding: 1rem 2rem;
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-title {
+            font-size: 1.2rem;
+            color: #00d4ff;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 1rem;
+            list-style: none;
+        }
+
+        .nav-tab {
+            background: #333;
+            color: #ffffff;
+            border: 1px solid #555;
+            border-radius: 6px;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .nav-tab:hover,
+        .nav-tab.active {
+            background: #00d4ff;
+            color: #000;
+        }
+
+        /* 主要内容区 */
+        .main-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Chrome浏览器外框 */
+        .browser-frame {
+            background: #2d2d2d;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            margin-bottom: 3rem;
+            overflow: hidden;
+        }
+
+        .browser-header {
+            background: #3d3d3d;
+            padding: 0.8rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            border-bottom: 1px solid #555;
+        }
+
+        .browser-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .browser-btn {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: none;
+        }
+
+        .browser-btn.close {
+            background: #ff5f56;
+        }
+
+        .browser-btn.minimize {
+            background: #ffbd2e;
+        }
+
+        .browser-btn.maximize {
+            background: #27ca3f;
+        }
+
+        .browser-url {
+            flex: 1;
+            background: #555;
+            border: none;
+            border-radius: 6px;
+            padding: 0.5rem 1rem;
+            color: #ffffff;
+            font-size: 0.9rem;
+            margin: 0 1rem;
+        }
+
+        .browser-content {
+            background: #ffffff;
+            min-height: 600px;
+            position: relative;
+        }
+
+        .browser-iframe {
+            width: 100%;
+            height: 600px;
+            border: none;
+            display: block;
+        }
+
+        /* 页面信息 */
+        .page-info {
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid #333;
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+            color: #00d4ff;
+            margin-bottom: 1rem;
+        }
+
+        .page-description {
+            color: #cccccc;
+            margin-bottom: 1rem;
+        }
+
+        .page-features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .feature-tag {
+            background: #333;
+            color: #00d4ff;
+            padding: 0.3rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+
+        /* 响应式设计 */
+        .responsive-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .responsive-frame {
+            background: #2d2d2d;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .responsive-header {
+            background: #3d3d3d;
+            padding: 0.5rem;
+            text-align: center;
+            color: #ffffff;
+            font-size: 0.8rem;
+        }
+
+        .responsive-iframe {
+            width: 100%;
+            height: 400px;
+            border: none;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .main-title {
+                font-size: 2rem;
+            }
+            
+            .nav-tabs {
+                flex-wrap: wrap;
+            }
+            
+            .responsive-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .browser-iframe,
+            .responsive-iframe {
+                height: 400px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 页面标题 -->
+    <header class="page-header">
+        <h1 class="main-title">个人网站原型设计稿</h1>
+        <p class="subtitle">基于需求文档设计的完整个人网站原型，包含首页、博客、作品展示和后台管理等功能模块</p>
+    </header>
+
+    <!-- 页面导航 -->
+    <nav class="page-nav">
+        <div class="nav-container">
+            <div class="nav-title">DevPortfolio 原型设计</div>
+            <ul class="nav-tabs">
+                <li class="nav-tab active" data-page="home">首页</li>
+                <li class="nav-tab" data-page="blog-list">博文列表</li>
+                <li class="nav-tab" data-page="blog-detail">文章详情</li>
+                <li class="nav-tab" data-page="portfolio">作品集</li>
+                <li class="nav-tab" data-page="admin-login">管理登录</li>
+                <li class="nav-tab" data-page="admin-dashboard">管理后台</li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- 主要内容区 -->
+    <main class="main-content">
+        <!-- 首页 -->
+        <section id="home" class="page-section active">
+            <div class="page-info">
+                <h2 class="page-title">首页设计</h2>
+                <p class="page-description">
+                    网站首页展示个人品牌形象，包含英雄区域、最新博文预览和精选作品展示。采用现代化的卡片式布局，
+                    突出展示技术栈和项目特色，提供良好的视觉层次和用户体验。
+                </p>
+                <div class="page-features">
+                    <span class="feature-tag">英雄区域</span>
+                    <span class="feature-tag">博客预览</span>
+                    <span class="feature-tag">作品展示</span>
+                    <span class="feature-tag">响应式设计</span>
+                    <span class="feature-tag">交互动效</span>
+                </div>
+            </div>
+
+            <div class="browser-frame">
+                <div class="browser-header">
+                    <div class="browser-buttons">
+                        <button class="browser-btn close"></button>
+                        <button class="browser-btn minimize"></button>
+                        <button class="browser-btn maximize"></button>
+                    </div>
+                    <input type="text" class="browser-url" value="https://devportfolio.com" readonly>
+                </div>
+                <div class="browser-content">
+                    <iframe src="index.html" class="browser-iframe"></iframe>
+                </div>
+            </div>
+        </section>
+
+        <!-- 博文列表页 -->
+        <section id="blog-list" class="page-section" style="display: none;">
+            <div class="page-info">
+                <h2 class="page-title">博文列表页</h2>
+                <p class="page-description">
+                    博文列表页面提供完整的文章浏览体验，包含筛选、搜索、分页等功能。支持按技术分类、年份筛选，
+                    以及按最新发布、最多阅读等排序方式，帮助用户快速找到感兴趣的内容。
+                </p>
+                <div class="page-features">
+                    <span class="feature-tag">筛选功能</span>
+                    <span class="feature-tag">搜索功能</span>
+                    <span class="feature-tag">分页设计</span>
+                    <span class="feature-tag">标签系统</span>
+                    <span class="feature-tag">统计信息</span>
+                </div>
+            </div>
+
+            <div class="browser-frame">
+                <div class="browser-header">
+                    <div class="browser-buttons">
+                        <button class="browser-btn close"></button>
+                        <button class="browser-btn minimize"></button>
+                        <button class="browser-btn maximize"></button>
+                    </div>
+                    <input type="text" class="browser-url" value="https://devportfolio.com/blog" readonly>
+                </div>
+                <div class="browser-content">
+                    <iframe src="blog-list.html" class="browser-iframe"></iframe>
+                </div>
+            </div>
+        </section>
+
+        <!-- 文章详情页 -->
+        <section id="blog-detail" class="page-section" style="display: none;">
+            <div class="page-info">
+                <h2 class="page-title">文章详情页</h2>
+                <p class="page-description">
+                    文章详情页提供沉浸式的阅读体验，包含阅读进度条、字体大小调节、暗色模式切换等功能。
+                    支持代码高亮、图片嵌入、相关推荐等特性，为用户提供舒适的阅读环境。
+                </p>
+                <div class="page-features">
+                    <span class="feature-tag">阅读进度条</span>
+                    <span class="feature-tag">字体调节</span>
+                    <span class="feature-tag">暗色模式</span>
+                    <span class="feature-tag">代码高亮</span>
+                    <span class="feature-tag">相关推荐</span>
+                </div>
+            </div>
+
+            <div class="browser-frame">
+                <div class="browser-header">
+                    <div class="browser-buttons">
+                        <button class="browser-btn close"></button>
+                        <button class="browser-btn minimize"></button>
+                        <button class="browser-btn maximize"></button>
+                    </div>
+                    <input type="text" class="browser-url" value="https://devportfolio.com/blog/react-18-features" readonly>
+                </div>
+                <div class="browser-content">
+                    <iframe src="blog-detail.html" class="browser-iframe"></iframe>
+                </div>
+            </div>
+        </section>
+
+        <!-- 作品集页面 -->
+        <section id="portfolio" class="page-section" style="display: none;">
+            <div class="page-info">
+                <h2 class="page-title">作品集页面</h2>
+                <p class="page-description">
+                    作品集页面采用瀑布流布局展示项目作品，突出预览图的视觉效果。支持按技术类型和复杂度筛选，
+                    每个作品卡片包含技术栈、项目描述、开发信息等详细信息。
+                </p>
+                <div class="page-features">
+                    <span class="feature-tag">瀑布流布局</span>
+                    <span class="feature-tag">技术筛选</span>
+                    <span class="feature-tag">复杂度分级</span>
+                    <span class="feature-tag">点赞功能</span>
+                    <span class="feature-tag">悬停效果</span>
+                </div>
+            </div>
+
+            <div class="browser-frame">
+                <div class="browser-header">
+                    <div class="browser-buttons">
+                        <button class="browser-btn close"></button>
+                        <button class="browser-btn minimize"></button>
+                        <button class="browser-btn maximize"></button>
+                    </div>
+                    <input type="text" class="browser-url" value="https://devportfolio.com/portfolio" readonly>
+                </div>
+                <div class="browser-content">
+                    <iframe src="portfolio.html" class="browser-iframe"></iframe>
+                </div>
+            </div>
+        </section>
+
+        <!-- 管理登录页 -->
+        <section id="admin-login" class="page-section" style="display: none;">
+            <div class="page-info">
+                <h2 class="page-title">管理登录页</h2>
+                <p class="page-description">
+                    管理员登录页面采用两步验证机制，提供安全的身份验证。包含用户名密码验证和邮箱OTP验证，
+                    具有倒计时、重新发送等安全功能，确保后台管理的安全性。
+                </p>
+                <div class="page-features">
+                    <span class="feature-tag">两步验证</span>
+                    <span class="feature-tag">OTP验证</span>
+                    <span class="feature-tag">倒计时功能</span>
+                    <span class="feature-tag">安全提示</span>
+                    <span class="feature-tag">表单验证</span>
+                </div>
+            </div>
+
+            <div class="browser-frame">
+                <div class="browser-header">
+                    <div class="browser-buttons">
+                        <button class="browser-btn close"></button>
+                        <button class="browser-btn minimize"></button>
+                        <button class="browser-btn maximize"></button>
+                    </div>
+                    <input type="text" class="browser-url" value="https://devportfolio.com/admin/login" readonly>
+                </div>
+                <div class="browser-content">
+                    <iframe src="admin-login.html" class="browser-iframe"></iframe>
+                </div>
+            </div>
+        </section>
+
+        <!-- 管理后台 -->
+        <section id="admin-dashboard" class="page-section" style="display: none;">
+            <div class="page-info">
+                <h2 class="page-title">管理后台</h2>
+                <p class="page-description">
+                    管理后台提供完整的内容管理功能，包含数据看板、博文管理、作品管理等模块。采用侧边栏导航设计，
+                    提供实时数据统计、快速操作入口和最近活动记录，方便管理员高效管理网站内容。
+                </p>
+                <div class="page-features">
+                    <span class="feature-tag">数据看板</span>
+                    <span class="feature-tag">侧边栏导航</span>
+                    <span class="feature-tag">实时统计</span>
+                    <span class="feature-tag">快速操作</span>
+                    <span class="feature-tag">活动记录</span>
+                </div>
+            </div>
+
+            <div class="browser-frame">
+                <div class="browser-header">
+                    <div class="browser-buttons">
+                        <button class="browser-btn close"></button>
+                        <button class="browser-btn minimize"></button>
+                        <button class="browser-btn maximize"></button>
+                    </div>
+                    <input type="text" class="browser-url" value="https://devportfolio.com/admin/dashboard" readonly>
+                </div>
+                <div class="browser-content">
+                    <iframe src="admin-dashboard.html" class="browser-iframe"></iframe>
+                </div>
+            </div>
+        </section>
+
+        <!-- 响应式设计展示 -->
+        <section class="responsive-showcase">
+            <div class="page-info">
+                <h2 class="page-title">响应式设计展示</h2>
+                <p class="page-description">
+                    网站采用响应式设计，在不同设备上都能提供良好的用户体验。以下是移动端和桌面端的对比展示。
+                </p>
+            </div>
+
+            <div class="responsive-grid">
+                <div class="responsive-frame">
+                    <div class="responsive-header">桌面端 (1200px+)</div>
+                    <iframe src="index.html" class="responsive-iframe"></iframe>
+                </div>
+                <div class="responsive-frame">
+                    <div class="responsive-header">移动端 (768px以下)</div>
+                    <iframe src="index.html" class="responsive-iframe"></iframe>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // 页面切换功能
+        document.querySelectorAll('.nav-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                const targetPage = this.dataset.page;
+                
+                // 更新导航状态
+                document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                
+                // 切换页面显示
+                document.querySelectorAll('.page-section').forEach(section => {
+                    section.style.display = 'none';
+                });
+                
+                const targetSection = document.getElementById(targetPage);
+                if (targetSection) {
+                    targetSection.style.display = 'block';
+                }
+            });
+        });
+
+        // 浏览器按钮交互
+        document.querySelectorAll('.browser-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const action = this.classList[1];
+                console.log('浏览器按钮点击:', action);
+                
+                // 这里可以添加实际的浏览器按钮功能
+                if (action === 'close') {
+                    this.closest('.browser-frame').style.opacity = '0.5';
+                }
+            });
+        });
+
+        // 自动切换展示（可选）
+        let currentPageIndex = 0;
+        const pages = ['home', 'blog-list', 'blog-detail', 'portfolio', 'admin-login', 'admin-dashboard'];
+        
+        function autoSwitch() {
+            currentPageIndex = (currentPageIndex + 1) % pages.length;
+            const targetTab = document.querySelector(`[data-page="${pages[currentPageIndex]}"]`);
+            if (targetTab) {
+                targetTab.click();
+            }
+        }
+
+        // 每30秒自动切换一次页面（可选，取消注释启用）
+        // setInterval(autoSwitch, 30000);
+
+        // 页面加载完成后的初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('原型设计页面加载完成');
+            
+            // 预加载所有iframe
+            const iframes = document.querySelectorAll('iframe');
+            iframes.forEach(iframe => {
+                iframe.addEventListener('load', function() {
+                    console.log('iframe加载完成:', this.src);
+                });
+            });
+        });
+    </script>
+</body>
+</html> 

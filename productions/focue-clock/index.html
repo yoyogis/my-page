@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>专注时钟</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .clock-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            width: 100%;
+        }
+
+        .countdown-circle {
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .countdown-time {
+            font-size: 3rem;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .current-time {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 20px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            width: 100%;
+        }
+
+        .duration-input {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .duration-input input {
+            width: 80px;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            font-size: 1rem;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .duration-input input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .duration-input label {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1rem;
+        }
+
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .status {
+            margin-top: 20px;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="clock-container">
+        <div class="countdown-circle">
+            <div class="countdown-time" id="countdown">30:00</div>
+            <div class="current-time" id="currentTime"></div>
+        </div>
+        <div class="duration-input">
+            <label for="focusDuration">专注时长（分钟）：</label>
+            <input type="number" id="focusDuration" min="1" max="180" value="30" />
+            <label for="intervalDuration">间隔音提示（分钟）：</label>
+            <input type="number" id="intervalDuration" min="1" max="60" value="5" />
+        </div>
+        <div class="controls">
+            <button onclick="startFocueClock(
+                parseInt(document.getElementById('focusDuration').value, 10) || 30,
+                parseInt(document.getElementById('intervalDuration').value, 10) || 5
+            )">开始专注时钟</button>
+            <button onclick="stopFocueClock()">停止</button>
+            <button onclick="resetFocueClock()">重置</button>
+        </div>
+        <div class="status" id="status">准备就绪</div>
+    </div>
+
+    <script>
+        let countdownInterval;
+        let remainingTime = 30 * 60; // 30分钟，以秒为单位
+        let isRunning = false;
+        let intervalTimers = [];
+
+        function updateCurrentTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('zh-CN', {
+                hour12: false,
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            document.getElementById('currentTime').textContent = timeString;
+        }
+
+        function updateCountdown() {
+            const minutes = Math.floor(remainingTime / 60);
+            const seconds = remainingTime % 60;
+            const timeString = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            document.getElementById('countdown').textContent = timeString;
+        }
+
+        function startCountdown() {
+            if (isRunning) return;
+            
+            isRunning = true;
+            document.getElementById('status').textContent = '专注时钟运行中...';
+            
+            countdownInterval = setInterval(() => {
+                remainingTime--;
+                updateCountdown();
+                
+                if (remainingTime <= 0) {
+                    stopFocueClock();
+                    document.getElementById('status').textContent = '专注时间结束！';
+                }
+            }, 1000);
+        }
+
+        function stopCountdown() {
+            if (countdownInterval) {
+                clearInterval(countdownInterval);
+                countdownInterval = null;
+            }
+            isRunning = false;
+        }
+
+        function clearAllTimers() {
+            intervalTimers.forEach(timer => {
+                clearTimeout(timer.timerId);
+            });
+            intervalTimers = [];
+        }
+
+        function playTone() {
+            // 三音阶上升提示音（C4-E4-G4），每个音150ms，最后一个音延长一点
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const notes = [261.63, 329.63, 392.00]; // C4, E4, G4
+            const duration = 0.15; // 每个音0.15秒
+            const gainNode = audioContext.createGain();
+            gainNode.gain.value = 0.3;
+            gainNode.connect(audioContext.destination);
+
+            notes.forEach((freq, i) => {
+                const osc = audioContext.createOscillator();
+                osc.type = 'triangle';
+                osc.frequency.value = freq;
+                osc.connect(gainNode);
+                const start = audioContext.currentTime + i * duration;
+                const stop = start + (i === notes.length - 1 ? duration * 1.5 : duration);
+                osc.start(start);
+                osc.stop(stop);
+            });
+
+            // 关闭audioContext，防止内存泄漏
+            setTimeout(() => {
+                audioContext.close();
+            }, (duration * notes.length + 0.3) * 1000);
+        }
+
+        function startFocueClock(totalMinutes = 30, intervalMinutes = 5) {
+            if (isRunning) {
+                stopFocueClock();
+            }
+            
+            remainingTime = totalMinutes * 60;
+            updateCountdown();
+            clearAllTimers();
+            
+            console.log('startFocueClock', totalMinutes, intervalMinutes, new Date().toISOString());
+            const totalIntervals = Math.floor(totalMinutes / intervalMinutes);
+
+            for (let i = 0; i < totalIntervals; i++) {
+                const intervalStart = i * intervalMinutes * 60 * 1000;
+                const intervalEnd = (i + 1) * intervalMinutes * 60 * 1000;
+                const randomOffset = Math.random() * (intervalEnd - intervalStart);
+                const playTime = intervalStart + randomOffset;
+
+                const timerId = setTimeout(() => {
+                    console.log('playTone', new Date().toISOString());
+                    playTone();
+                }, playTime);
+
+                intervalTimers.push({ timerId, playTime: playTime / 1000 });
+            }
+
+            console.log('intervalTimers', intervalTimers);
+            startCountdown();
+        }
+
+        function stopFocueClock() {
+            stopCountdown();
+            clearAllTimers();
+            document.getElementById('status').textContent = '已停止';
+        }
+
+        function resetFocueClock() {
+            stopFocueClock();
+            const focusInput = document.getElementById('focusDuration');
+            const minutes = focusInput ? (parseInt(focusInput.value, 10) || 30) : 30;
+            remainingTime = minutes * 60;
+            updateCountdown();
+            document.getElementById('status').textContent = '准备就绪';
+        }
+
+        // 初始化
+        updateCurrentTime();
+        updateCountdown();
+        
+        // 每秒更新当前时间
+        setInterval(updateCurrentTime, 1000);
+    </script>
+</body>
+
+</html>

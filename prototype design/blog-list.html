@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的文章 - 博文列表</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            line-height: 1.6;
+        }
+
+        /* 导航栏 */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #333;
+            z-index: 1000;
+            padding: 1rem 2rem;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .nav-search {
+            position: relative;
+            min-width: 300px;
+        }
+
+        .nav-search-input {
+            background: #333;
+            color: #ffffff;
+            border: 1px solid #555;
+            border-radius: 6px;
+            padding: 0.5rem 1rem 0.5rem 2.5rem;
+            font-size: 0.9rem;
+            width: 100%;
+        }
+
+        .nav-search-input:focus {
+            outline: none;
+            border-color: #00d4ff;
+        }
+
+        .nav-search-icon {
+            position: absolute;
+            left: 0.8rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #888;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #00d4ff;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: #ffffff;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #00d4ff;
+        }
+
+        /* 主要内容 */
+        .main-content {
+            margin-top: 80px;
+            padding: 2rem;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* 页面标题 */
+        .page-header {
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            color: #00d4ff;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-subtitle {
+            color: #cccccc;
+            font-size: 1.1rem;
+        }
+
+
+
+        /* 文章列表 */
+        .articles-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .article-card {
+            background: transparent;
+            padding: 2rem 0;
+            border-bottom: 1px solid #333;
+            width: 100%;
+        }
+
+        .article-card:last-child {
+            border-bottom: none;
+        }
+
+        .article-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            color: #888;
+        }
+
+        .article-tags {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            background: #333;
+            color: #00d4ff;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+
+        .article-title {
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+            color: #ffffff;
+            line-height: 1.4;
+        }
+
+        .article-excerpt {
+            color: #cccccc;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .article-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .stats-item {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        .read-more {
+            background: linear-gradient(45deg, #00d4ff, #0099cc);
+            color: white;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .read-more:hover {
+            transform: scale(1.05);
+        }
+
+        /* 分页 */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 2rem;
+        }
+
+        .page-btn {
+            background: #333;
+            color: #ffffff;
+            border: 1px solid #555;
+            border-radius: 6px;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .page-btn:hover {
+            background: #00d4ff;
+            color: #000;
+        }
+
+        .page-btn.active {
+            background: #00d4ff;
+            color: #000;
+        }
+
+        .page-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .nav-search {
+                min-width: 200px;
+            }
+            
+            .article-card {
+                padding: 1.5rem 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-left">
+                <div class="logo">DevPortfolio</div>
+                <div class="nav-search">
+                    <span class="nav-search-icon">🔍</span>
+                    <input type="text" class="nav-search-input" placeholder="搜索文章和作品..." id="navSearch">
+                </div>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html">首页</a></li>
+                <li><a href="blog-list.html">我的文章</a></li>
+                <li><a href="portfolio.html">作品集</a></li>
+                <li><a href="admin-login.html">管理入口</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- 主要内容 -->
+    <main class="main-content">
+        <!-- 页面标题 -->
+        <header class="page-header">
+            <h1 class="page-title">我的文章</h1>
+            <p class="page-subtitle">分享技术心得，记录学习历程</p>
+        </header>
+
+
+
+        <!-- 文章列表 -->
+        <section class="articles-grid">
+            <article class="article-card">
+                <div class="article-meta">
+                    <span>2024-01-15</span>
+                    <div class="article-tags">
+                        <span class="tag">React</span>
+                        <span class="tag">JavaScript</span>
+                    </div>
+                </div>
+                <h2 class="article-title">React 18 新特性深度解析</h2>
+                <p class="article-excerpt">
+                    深入探讨React 18带来的并发特性、自动批处理、Suspense改进等核心功能，以及如何在实际项目中应用这些新特性来提升用户体验。本文将详细介绍每个新特性的使用场景和最佳实践...
+                </p>
+                <div class="article-stats">
+                    <div class="stats-item">
+                        <span>👁️</span>
+                        <span>1,234</span>
+                    </div>
+                    <div class="stats-item">
+                        <span>💬</span>
+                        <span>23</span>
+                    </div>
+                    <div class="stats-item">
+                        <span>❤️</span>
+                        <span>156</span>
+                    </div>
+                </div>
+                <a href="blog-detail.html" class="read-more">继续阅读</a>
+            </article>
+
+            <article class="article-card">
+                <div class="article-meta">
+                    <span>2024-01-10</span>
+                    <div class="article-tags">
+                        <span class="tag">TypeScript</span>
+                        <span class="tag">高级类型</span>
+                    </div>
+                </div>
+                <h2 class="article-title">TypeScript 高级类型技巧</h2>
+                <p class="article-excerpt">
+                    分享一些TypeScript高级类型的使用技巧，包括条件类型、映射类型、模板字面量类型等，帮助你写出更优雅的类型定义。通过实际案例展示如何利用这些特性提升代码的类型安全性...
+                </p>
+                <div class="article-stats">
+                    <div class="stats-item">
+                        <span>👁️</span>
+                        <span>856</span>
+                    </div>
+                    <div class="stats-item">
+                        <span>💬</span>
+                        <span>15</span>
+                    </div>
+                    <div class="stats-item">
+                        <span>❤️</span>
+                        <span>89</span>
+                    </div>
+                </div>
+                <a href="blog-detail.html" class="read-more">继续阅读</a>
+            </article>
+
+            <article class="article-card">
+                <div class="article-meta">
+                    <span>2024-01-05</span>
+                    <div class="article-tags">
+                        <span class="tag">CSS</span>
+                        <span class="tag">布局</span>
+                    </div>
+                </div>
+                <h2 class="article-title">现代CSS布局技术对比</h2>
+                <p class="article-excerpt">
+                    对比Flexbox、Grid、Container Queries等现代CSS布局技术，分析它们的适用场景和最佳实践，帮助你选择最合适的布局方案。包含详细的代码示例和性能对比分析...
+                </p>
+                <div class="article-stats">
+                    <div class="stats-item">
+                        <span>👁️</span>
+                        <span>1,567</span>
+                    </div>
+                    <div class="stats-item">
+                        <span>💬</span>
+                        <span>34</span>
+                    </div>
+                    <div class="stats-item">
+                        <span>❤️</span>
+                        <span>234</span>
+                    </div>
+                </div>
+                <a href="blog-detail.html" class="read-more">继续阅读</a>
+            </article>
+
+            <article class="article-card">
+                <div class="article-meta">
+                    <span>2023-12-28</span>
+                    <div class="article-tags">
+                        <span class="tag">Vue.js</span>
+                        <span class="tag">Composition API</span>
+                    </div>
+                </div>
+                <h2 class="article-title">Vue 3 Composition API 实战指南</h2>
+                <p class="article-excerpt">
+                    详细介绍Vue 3 Composition API的使用方法和最佳实践，包括响应式系统、生命周期钩子、依赖注入等核心概念。通过实际项目案例展示如何重构现有组件...
+                </p>
+                <div class="article-stats">
+                    <div class="stats-item">
+                        <span>👁️</span>
+                        <span>2,134</span>
+                    </div>
+                    <div class="stats-item">
+                        <span>💬</span>
+                        <span>45</span>
+                    </div>
+                    <div class="stats-item">
+                        <span>❤️</span>
+                        <span>312</span>
+                    </div>
+                </div>
+                <a href="blog-detail.html" class="read-more">继续阅读</a>
+            </article>
+
+            <article class="article-card">
+                <div class="article-meta">
+                    <span>2023-12-20</span>
+                    <div class="article-tags">
+                        <span class="tag">Node.js</span>
+                        <span class="tag">性能优化</span>
+                    </div>
+                </div>
+                <h2 class="article-title">Node.js 性能优化实战技巧</h2>
+                <p class="article-excerpt">
+                    分享Node.js应用性能优化的实用技巧，包括内存管理、异步处理、缓存策略、数据库优化等方面。通过性能测试和监控工具展示优化效果...
+                </p>
+                <div class="article-stats">
+                    <div class="stats-item">
+                        <span>👁️</span>
+                        <span>1,789</span>
+                    </div>
+                    <div class="stats-item">
+                        <span>💬</span>
+                        <span>28</span>
+                    </div>
+                    <div class="stats-item">
+                        <span>❤️</span>
+                        <span>198</span>
+                    </div>
+                </div>
+                <a href="blog-detail.html" class="read-more">继续阅读</a>
+            </article>
+
+            <article class="article-card">
+                <div class="article-meta">
+                    <span>2023-12-15</span>
+                    <div class="article-tags">
+                        <span class="tag">Webpack</span>
+                        <span class="tag">构建工具</span>
+                    </div>
+                </div>
+                <h2 class="article-title">Webpack 5 配置优化指南</h2>
+                <p class="article-excerpt">
+                    深入解析Webpack 5的配置优化技巧，包括代码分割、懒加载、缓存策略、Tree Shaking等核心功能。提供完整的配置示例和性能对比数据...
+                </p>
+                <div class="article-stats">
+                    <div class="stats-item">
+                        <span>👁️</span>
+                        <span>1,456</span>
+                    </div>
+                    <div class="stats-item">
+                        <span>💬</span>
+                        <span>19</span>
+                    </div>
+                    <div class="stats-item">
+                        <span>❤️</span>
+                        <span>167</span>
+                    </div>
+                </div>
+                <a href="blog-detail.html" class="read-more">继续阅读</a>
+            </article>
+        </section>
+
+        <!-- 分页 -->
+        <div class="pagination">
+            <button class="page-btn" disabled>上一页</button>
+            <button class="page-btn active">1</button>
+            <button class="page-btn">2</button>
+            <button class="page-btn">3</button>
+            <button class="page-btn">4</button>
+            <button class="page-btn">5</button>
+            <button class="page-btn">下一页</button>
+        </div>
+    </main>
+
+    <script>
+        // 导航栏搜索功能
+        const navSearch = document.getElementById('navSearch');
+        
+        navSearch.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                const keyword = this.value.trim();
+                if (keyword) {
+                    // 跳转到搜索结果页
+                    window.location.href = `search-results.html?q=${encodeURIComponent(keyword)}`;
+                }
+            }
+        });
+
+        // 分页功能
+        document.querySelectorAll('.page-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                if (!this.disabled) {
+                    document.querySelector('.page-btn.active').classList.remove('active');
+                    this.classList.add('active');
+                    console.log('切换到页面:', this.textContent);
+                }
+            });
+        });
+    </script>
+</body>
+</html> 

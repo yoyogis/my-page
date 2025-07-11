@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>搜索结果 - DevPortfolio</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            line-height: 1.6;
+        }
+
+        /* 导航栏 */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #333;
+            z-index: 1000;
+            padding: 1rem 2rem;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #00d4ff;
+        }
+
+        .nav-search {
+            position: relative;
+            min-width: 300px;
+        }
+
+        .nav-search-input {
+            background: #333;
+            color: #ffffff;
+            border: 1px solid #555;
+            border-radius: 6px;
+            padding: 0.5rem 1rem 0.5rem 2.5rem;
+            font-size: 0.9rem;
+            width: 100%;
+        }
+
+        .nav-search-input:focus {
+            outline: none;
+            border-color: #00d4ff;
+        }
+
+        .nav-search-icon {
+            position: absolute;
+            left: 0.8rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #888;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: #ffffff;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #00d4ff;
+        }
+
+        /* 主要内容 */
+        .main-content {
+            margin-top: 80px;
+            padding: 2rem;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* 搜索结果头部 */
+        .search-header {
+            margin-bottom: 2rem;
+        }
+
+        .search-title {
+            font-size: 2rem;
+            color: #00d4ff;
+            margin-bottom: 0.5rem;
+        }
+
+        .search-subtitle {
+            color: #cccccc;
+            font-size: 1.1rem;
+        }
+
+        .search-keyword {
+            color: #00d4ff;
+            font-weight: bold;
+        }
+
+        /* 结果统计 */
+        .results-stats {
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid #333;
+            display: flex;
+            gap: 2rem;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .stat-icon {
+            font-size: 1.2rem;
+        }
+
+        .stat-text {
+            color: #cccccc;
+        }
+
+        .stat-number {
+            color: #00d4ff;
+            font-weight: bold;
+        }
+
+        /* 结果分类标签 */
+        .result-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid #333;
+            padding-bottom: 1rem;
+        }
+
+        .result-tab {
+            background: #333;
+            color: #ffffff;
+            border: 1px solid #555;
+            border-radius: 6px;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .result-tab:hover,
+        .result-tab.active {
+            background: #00d4ff;
+            color: #000;
+        }
+
+        /* 文章列表 */
+        .articles-section {
+            margin-bottom: 3rem;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            color: #00d4ff;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .articles-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .article-item {
+            background: transparent;
+            padding: 1.5rem 0;
+            border-bottom: 1px solid #333;
+            width: 100%;
+        }
+
+        .article-item:last-child {
+            border-bottom: none;
+        }
+
+        .article-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            color: #888;
+        }
+
+        .article-tags {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            background: #333;
+            color: #00d4ff;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+
+        .article-title {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+            color: #ffffff;
+            line-height: 1.4;
+        }
+
+        .article-excerpt {
+            color: #cccccc;
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        .article-stats {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .stats-item {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        .read-more {
+            background: linear-gradient(45deg, #00d4ff, #0099cc);
+            color: white;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 0.9rem;
+        }
+
+        .read-more:hover {
+            transform: scale(1.05);
+        }
+
+        /* 作品列表 */
+        .portfolio-section {
+            margin-bottom: 3rem;
+        }
+
+        .portfolio-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .portfolio-card {
+            background: #1a1a1a;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #333;
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+        }
+
+        .portfolio-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 15px 40px rgba(0, 212, 255, 0.3);
+        }
+
+        .portfolio-image {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(45deg, #00d4ff, #0099cc);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: white;
+        }
+
+        .portfolio-content {
+            padding: 1.5rem;
+        }
+
+        .portfolio-title {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            color: #ffffff;
+        }
+
+        .portfolio-tech {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .tech-tag {
+            background: #333;
+            color: #00d4ff;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+
+        .portfolio-description {
+            color: #cccccc;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .portfolio-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .like-button {
+            background: none;
+            border: none;
+            color: #ff6b6b;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: transform 0.2s;
+        }
+
+        .like-button:hover {
+            transform: scale(1.2);
+        }
+
+        .like-button.liked {
+            color: #ff4757;
+        }
+
+        .view-project {
+            background: #00d4ff;
+            color: white;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        /* 无结果状态 */
+        .no-results {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #888;
+        }
+
+        .no-results-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .no-results-title {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #cccccc;
+        }
+
+        .no-results-text {
+            font-size: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .suggestions {
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid #333;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .suggestions h4 {
+            color: #00d4ff;
+            margin-bottom: 1rem;
+        }
+
+        .suggestions ul {
+            list-style: none;
+            text-align: left;
+        }
+
+        .suggestions li {
+            margin-bottom: 0.5rem;
+            color: #cccccc;
+        }
+
+        .suggestions li::before {
+            content: '•';
+            color: #00d4ff;
+            margin-right: 0.5rem;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .nav-search {
+                min-width: 200px;
+            }
+            
+            .results-stats {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .portfolio-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .search-title {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-left">
+                <div class="logo">DevPortfolio</div>
+                <div class="nav-search">
+                    <span class="nav-search-icon">🔍</span>
+                    <input type="text" class="nav-search-input" placeholder="搜索文章和作品..." id="navSearch" value="React">
+                </div>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html">首页</a></li>
+                <li><a href="blog-list.html">我的文章</a></li>
+                <li><a href="portfolio.html">作品集</a></li>
+                <li><a href="admin-login.html">管理入口</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- 主要内容 -->
+    <main class="main-content">
+        <!-- 搜索结果头部 -->
+        <header class="search-header">
+            <h1 class="search-title">搜索结果</h1>
+            <p class="search-subtitle">关键词：<span class="search-keyword" id="searchKeyword">React</span></p>
+        </header>
+
+        <!-- 结果统计 -->
+        <section class="results-stats">
+            <div class="stat-item">
+                <span class="stat-icon">📝</span>
+                <span class="stat-text">找到文章：</span>
+                <span class="stat-number" id="articleCount">2</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-icon">🎨</span>
+                <span class="stat-text">找到作品：</span>
+                <span class="stat-number" id="portfolioCount">1</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-icon">⏱️</span>
+                <span class="stat-text">搜索用时：</span>
+                <span class="stat-number">0.12s</span>
+            </div>
+        </section>
+
+        <!-- 结果分类标签 -->
+        <div class="result-tabs">
+            <button class="result-tab active" data-tab="all">全部结果 (3)</button>
+            <button class="result-tab" data-tab="articles">文章 (2)</button>
+            <button class="result-tab" data-tab="portfolio">作品 (1)</button>
+        </div>
+
+        <!-- 文章搜索结果 -->
+        <section class="articles-section" id="articlesSection">
+            <h2 class="section-title">
+                <span>📝</span>
+                相关文章
+            </h2>
+            <div class="articles-list">
+                <article class="article-item">
+                    <div class="article-meta">
+                        <span>2024-01-15</span>
+                        <div class="article-tags">
+                            <span class="tag">React</span>
+                            <span class="tag">JavaScript</span>
+                        </div>
+                    </div>
+                    <h3 class="article-title">React 18 新特性深度解析</h3>
+                    <p class="article-excerpt">
+                        深入探讨<span class="search-highlight">React</span> 18带来的并发特性、自动批处理、Suspense改进等核心功能，以及如何在实际项目中应用这些新特性来提升用户体验...
+                    </p>
+                    <div class="article-stats">
+                        <div class="stats-item">
+                            <span>👁️</span>
+                            <span>1,234</span>
+                        </div>
+                        <div class="stats-item">
+                            <span>💬</span>
+                            <span>23</span>
+                        </div>
+                        <div class="stats-item">
+                            <span>❤️</span>
+                            <span>156</span>
+                        </div>
+                        <a href="blog-detail.html" class="read-more">继续阅读</a>
+                    </div>
+                </article>
+
+                <article class="article-item">
+                    <div class="article-meta">
+                        <span>2023-12-28</span>
+                        <div class="article-tags">
+                            <span class="tag">React</span>
+                            <span class="tag">状态管理</span>
+                        </div>
+                    </div>
+                    <h3 class="article-title">React 状态管理最佳实践</h3>
+                    <p class="article-excerpt">
+                        分享<span class="search-highlight">React</span>项目中状态管理的最佳实践，包括useState、useReducer、Context API的使用场景，以及如何选择合适的状态管理方案...
+                    </p>
+                    <div class="article-stats">
+                        <div class="stats-item">
+                            <span>👁️</span>
+                            <span>987</span>
+                        </div>
+                        <div class="stats-item">
+                            <span>💬</span>
+                            <span>18</span>
+                        </div>
+                        <div class="stats-item">
+                            <span>❤️</span>
+                            <span>89</span>
+                        </div>
+                        <a href="blog-detail.html" class="read-more">继续阅读</a>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <!-- 作品搜索结果 -->
+        <section class="portfolio-section" id="portfolioSection">
+            <h2 class="section-title">
+                <span>🎨</span>
+                相关作品
+            </h2>
+            <div class="portfolio-grid">
+                <div class="portfolio-card">
+                    <div class="portfolio-image">🎨</div>
+                    <div class="portfolio-content">
+                        <h3 class="portfolio-title">智能任务管理系统</h3>
+                        <div class="portfolio-tech">
+                            <span class="tech-tag">React</span>
+                            <span class="tech-tag">TypeScript</span>
+                            <span class="tech-tag">Node.js</span>
+                        </div>
+                        <p class="portfolio-description">
+                            基于<span class="search-highlight">React</span>和Node.js的智能任务管理平台，支持拖拽排序、实时协作、数据可视化等功能
+                        </p>
+                        <div class="portfolio-actions">
+                            <button class="like-button">❤️ 42</button>
+                            <a href="#" class="view-project">查看项目</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // 解析URL参数获取搜索关键词
+        function getSearchKeyword() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('q') || 'React';
+        }
+
+        // 初始化搜索关键词
+        const initialKeyword = getSearchKeyword();
+        const navSearch = document.getElementById('navSearch');
+        const searchKeyword = document.getElementById('searchKeyword');
+        
+        // 设置初始值
+        navSearch.value = initialKeyword;
+        searchKeyword.textContent = initialKeyword;
+        
+        navSearch.addEventListener('input', function() {
+            const keyword = this.value.trim();
+            if (keyword) {
+                searchKeyword.textContent = keyword;
+                // 这里可以添加实时搜索逻辑
+                console.log('搜索关键词:', keyword);
+            }
+        });
+
+        // 结果标签切换
+        document.querySelectorAll('.result-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                const targetTab = this.dataset.tab;
+                
+                // 更新标签状态
+                document.querySelectorAll('.result-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                
+                // 显示/隐藏对应内容
+                if (targetTab === 'all') {
+                    document.getElementById('articlesSection').style.display = 'block';
+                    document.getElementById('portfolioSection').style.display = 'block';
+                } else if (targetTab === 'articles') {
+                    document.getElementById('articlesSection').style.display = 'block';
+                    document.getElementById('portfolioSection').style.display = 'none';
+                } else if (targetTab === 'portfolio') {
+                    document.getElementById('articlesSection').style.display = 'none';
+                    document.getElementById('portfolioSection').style.display = 'block';
+                }
+            });
+        });
+
+        // 点赞功能
+        document.querySelectorAll('.like-button').forEach(button => {
+            button.addEventListener('click', function() {
+                this.classList.toggle('liked');
+                const currentText = this.textContent;
+                const currentLikes = parseInt(currentText.match(/\d+/)[0]);
+                
+                if (this.classList.contains('liked')) {
+                    this.textContent = `❤️ ${currentLikes + 1}`;
+                } else {
+                    this.textContent = `❤️ ${currentLikes - 1}`;
+                }
+            });
+        });
+
+        // 回车键搜索
+        navSearch.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                const keyword = this.value.trim();
+                if (keyword) {
+                    // 更新URL并重新搜索
+                    const newUrl = `search-results.html?q=${encodeURIComponent(keyword)}`;
+                    window.location.href = newUrl;
+                }
+            }
+        });
+    </script>
+</body>
+</html> 
